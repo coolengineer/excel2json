@@ -1,7 +1,7 @@
 excel2json
 ==========
 
-(C) Copyright 2013 by Hojin Choi <hojin.choi@gmail.com>
+Copyright (C) 2013 by Hojin Choi <hojin.choi@gmail.com>
 
 Excel2json is a converting script that supports to managing well structured excel data to json format.
 
@@ -30,3 +30,6 @@ By running wscript.exe Excel2Json.js file1.xlsx file2.xlsx product (for e.g.)
 	2. But it does not search the directory for excel files.
 	3. And use the 'product' directory for its output storage.
 	
+Excel-contents-format:
+
+	See sample excel files! (Provided English, Korean versions)
