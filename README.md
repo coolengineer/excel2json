@@ -5,7 +5,7 @@ Copyright (C) 2013 by Hojin Choi <hojin.choi@gmail.com>
 
 Excel2json is a converting script that supports to managing well structured excel data to json format.
 
-You can freely distribute this product with MIT License
+You can freely distribute this product with A-CUP-OF-BEER License (See source code)
 
 *USAGE*
 
