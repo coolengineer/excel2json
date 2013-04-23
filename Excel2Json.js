@@ -41,14 +41,15 @@ var E = WScript.CreateObject("Excel.Application");
 E.DisplayAlerts = false;
 E.Visible = true;
 
-var g_pwd = W.ScriptFullName.replace( W.ScriptName, "" );
+var g_scriptFolder = W.ScriptFullName.replace( W.ScriptName, "" );
 var g_logFd = null;
 var g_popupMsg = "";
-var g_localConfig = g_pwd + "Excel2Json.config.js";
+var g_localConfig = g_scriptFolder + "Excel2Json.config.js";
 
 // Default Configuration
 // DO NOT CHANGE THIS VALUE, MAKE Excel2Json.config.js FILE AND COPY THESE LINES AND EDIT THEM!!
-var g_targetDir  = "output";
+var g_sourceFolder = g_scriptFolder;
+var g_targetFolder = "output"; // subdirectory in g_sourceFolder
 var g_tempSuffix = ".$$$";
 var g_prettyOutput = true; // false for compact
 
@@ -418,7 +419,7 @@ String.prototype.endsWith = function(suffix) {
 
 function setScanningFile( csvFile )
 {
-	csvFile = csvFile.replace( g_pwd, "" );
+	csvFile = csvFile.replace( g_sourceFolder, "" );
 	var sheetName = csvFile;
 	var idx = csvFile.indexOf( g_tempSuffix );
 	sheetName = sheetName.substring( idx + g_tempSuffix.length + 1 ).replace(".csv", "");
@@ -429,9 +430,11 @@ function logn( str )
 {
 	str = String(str).replace("\r\n", "\n").replace("\n", "\r\n");
 	if( g_logFd == null ) {
-		g_logFd = F.OpenTextFile( g_pwd + "ExcelJson.log", 2, true, 0 ); // 2: write,  8: append mode
+		g_logFd = F.OpenTextFile( g_sourceFolder + "ExcelJson.log", 2, true, 0 ); // 2: write,  8: append mode
 	}
-	g_logFd.Write( str );
+	if( g_logFd ) {
+		g_logFd.Write( str );
+	}
 }
 
 function log( str )
@@ -439,7 +442,7 @@ function log( str )
 	logn( str + "\n" );
 }
 
-log( "Working directory: " + g_pwd );
+log( "Working directory: " + g_sourceFolder );
 
 function getLoc( withoutColumnInfo )
 {
@@ -471,12 +474,11 @@ function popup( str, withoutColumnInfo, withoutScanningInfo )
 
 function saveJson( excelFile, jsonString )
 {
-	var targetDir = g_pwd + g_targetDir;
-	var jsonFileName = String(excelFile).replace(g_pwd, "").replace(".xlsx", "").replace(".xls", "") + ".json";
-	var jsonPath = targetDir + "\\" + jsonFileName;
+	var jsonFileName = String(excelFile).replace(g_sourceFolder, "").replace(".xlsx", "").replace(".xls", "") + ".json";
+	var jsonPath = g_targetFolder + jsonFileName;
 
-	if( !F.FolderExists( targetDir ) ) {
-		F.CreateFolder( targetDir );
+	if( !F.FolderExists( g_targetFolder ) ) {
+		F.CreateFolder( g_targetFolder );
 	}
 	
 	//http://msdn.microsoft.com/en-us/library/windows/desktop/ms677486(v=vs.85).aspx 
@@ -500,6 +502,14 @@ function saveJson( excelFile, jsonString )
 	popup( "Output: " + jsonPath, false, true );
 }
 
+function isExcel(filename)
+{
+	if( filename.endsWith(".xlsx") || filename.endsWith(".xls") ) {
+		return true;
+	}
+	return false;
+}
+
 function getExcelFiles( dir )
 {
 	var sourceDirectory = F.GetFolder( dir );
@@ -512,7 +522,7 @@ function getExcelFiles( dir )
 		if( file.Name.substr(0,1) == "~" ) {
 			continue;
 		}
-		if( file.Name.endsWith(".xlsx") || file.Name.endsWith(".xls") ) {
+		if( isExcel( file.Path ) ) {
 			excels.push( String(file.Path) );
 		}
 	}
@@ -533,6 +543,15 @@ function deleteTemp( tmpdir )
 	
 	//Let's do it!
 	F.DeleteFolder( tmpdir, true );
+}
+
+function assertTraillingOneSlash( path )
+{
+	while( path.endsWith("\\") ) {
+		path = path.substr(0, path.length-1);
+	}
+	path += "\\";
+	return path;
 }
 
 function saveAsCSV( sheet, tmpdir )
@@ -865,14 +884,30 @@ function parseExcel( excelFile )
 	return JSON.stringify( rootObject );
 }
 
-objArgs = WScript.Arguments;
-for (i = 0; i < objArgs.length; i++)
-{
-   WScript.Echo(objArgs(i));
-}
-
 try {
-	var excels = getExcelFiles(g_pwd);
+	g_sourceFolder = assertTraillingOneSlash( g_sourceFolder );
+
+	var excels = [];
+	objArgs = WScript.Arguments;
+	if( objArgs.length > 0 ) {
+		for (i = 0; i < objArgs.length; i++)
+		{
+			if( isExcel( objArgs(i) ) ) {
+				excels.push( g_sourceFolder + objArgs(i) );
+			}
+		}
+		if( !isExcel( objArgs( objArgs.length - 1) ) ) {
+			g_targetFolder = objArgs( objArgs.length - 1);
+		}
+	} else {
+		excels = getExcelFiles(g_sourceFolder);
+	}
+	if( excels.length == 0 ) {
+		W.Echo("There is no excel files in\n" + g_sourceFolder );
+	}
+	
+	g_targetFolder = g_sourceFolder + g_targetFolder;
+	g_targetFolder = assertTraillingOneSlash( g_targetFolder );
 	for( var i in excels )
 	{
 		var jsonString = parseExcel(excels[i]);
