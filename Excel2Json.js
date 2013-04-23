@@ -1,6 +1,6 @@
 /*****
 
-Excel - JSON Builder v1.0
+Excel2JSON, Excel - JSON Builder v1.0
 
 You may use/distribute freely under the MIT license.
 Copyright (C) 2013 Hojin Choi <hojin.choi@gmail.com>
@@ -31,21 +31,35 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * CLOSE ALL EXCEL JOBS
  */
 
+ // Global Stubs for Active-X
 var W = WScript;
 var S = WScript.CreateObject("WScript.Shell");
 var F = WScript.CreateObject("Scripting.FileSystemObject");
 var E = WScript.CreateObject("Excel.Application");
 
+// Turn off excel alert
 E.DisplayAlerts = false;
 E.Visible = true;
-
-var g_targetDir  = "design";
-var g_tempSuffix = ".$$$";
 
 var g_pwd = W.ScriptFullName.replace( W.ScriptName, "" );
 var g_logFd = null;
 var g_popupMsg = "";
+var g_localConfig = g_pwd + "Excel2Json.config.js";
 
+// Default Configuration
+// DO NOT CHANGE THIS VALUE, MAKE Excel2Json.config.js FILE AND COPY THESE LINES AND EDIT THEM!!
+var g_targetDir  = "output";
+var g_tempSuffix = ".$$$";
+var g_prettyOutput = true; // false for compact
+
+if( F.FileExists( g_localConfig ) ) {
+	var fd = F.OpenTextFile( g_localConfig, 1, false, 0 );
+	var content = fd.ReadAll();
+	fd.Close();
+	eval(content);
+}
+
+// Parsing context
 var scanning = {
 	file : "",
 	row  : 0,
@@ -274,7 +288,7 @@ if (typeof JSON !== 'object') {
 
             var i;
             gap = '';
-            indent = '';
+            indent = g_prettyOutput ? '\t' : '';
 
 // If the space parameter is a number, make an indent string containing that
 // many spaces.
@@ -394,7 +408,7 @@ if (typeof JSON !== 'object') {
 }());
 
 /*
- * NOW Excel-JSON Body
+ * NOW Excel2Json Body
  */
 
 

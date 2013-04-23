@@ -1,0 +1,3 @@
+var g_targetDir  = "output";
+var g_tempSuffix = ".$$$";
+var g_prettyOutput = true; // false for compact
