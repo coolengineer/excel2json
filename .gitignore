@@ -1,5 +1,7 @@
 
 *.log
+design
+output
 
 #################
 ## Eclipse
