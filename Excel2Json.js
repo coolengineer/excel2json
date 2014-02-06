@@ -626,6 +626,7 @@ function readCSVLine( csvLine )
 	var values = [];
 	var value = null;
 	var inQuote = false;
+	csvLine = String(csvLine);
 	for(var i=0; i<csvLine.length; i++) {
 		var ch = csvLine.charAt(i);
 		var chNext = '';
