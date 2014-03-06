@@ -477,7 +477,7 @@ function logn( str )
 {
 	str = String(str).replace("\r\n", "\n").replace("\n", "\r\n");
 	if( g_logFd == null ) {
-		g_logFd = F.OpenTextFile( g_sourceFolder + "ExcelJson.log", 2, true, 0 ); // 2: write,  8: append mode
+		g_logFd = F.OpenTextFile( g_targetFolder + "ExcelJson.log", 2, true, 0 ); // 2: write,  8: append mode
 	}
 	if( g_logFd ) {
 		g_logFd.Write( str );
@@ -489,7 +489,7 @@ function log( str )
 	logn( str + "\n" );
 }
 
-log( "Working directory: " + g_sourceFolder );
+//log( "Working directory: " + g_sourceFolder );
 
 function getLoc( withoutColumnInfo )
 {
@@ -591,6 +591,22 @@ function deleteTemp( tmpdir )
 	//Let's do it!
 	F.DeleteFolder( tmpdir, true );
 }
+
+function deleteTempFiles( dir )
+{
+	var sourceDirectory = F.GetFolder( dir );
+	var files = new Enumerator( sourceDirectory.files );
+	var excels = [];
+	var msg ="";
+	for(; !files.atEnd(); files.moveNext() )
+	{
+		var file = files.item();
+		if( file.Name.endsWith( ".Identifier" ) ) {
+			F.DeleteFile( file.Name );
+		}
+	}
+}
+
 
 function assertTraillingOneSlash( path )
 {
@@ -961,6 +977,7 @@ try {
 		var jsonString = parseExcel(excels[i]);
 		saveJson( excels[i], jsonString );
 	}
+	deleteTempFiles( g_sourceFolder );
 
 	if( g_popupMsg ) {
 		W.Echo( g_popupMsg );
