@@ -190,7 +190,7 @@ array value. so, the result will be like this.
 
 ### '!' prefixed sheet name ###
 
-You can insert '!' mark before a sheet name which is not considerred to be parsed. For e.g. '!Samples', '!Test' or '!Templates'.
+You can insert '!' mark before a sheet name which will not be considered to be parsed. For e.g. '!Samples', '!Test' or '!Templates'.
 
 ## RUN Excel2Json.js ##
 
