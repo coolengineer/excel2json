@@ -475,7 +475,7 @@ function setScanningFile( csvFile )
 
 function logn( str )
 {
-	str = String(str).replace("\r\n", "\n").replace("\n", "\r\n");
+	//str = String(str).replace("\r\n", "\n").replace("\n", "\r\n");
 	if( g_logFd == null ) {
 		g_logFd = F.OpenTextFile( g_targetFolder + "ExcelJson.log", 2, true, 0 ); // 2: write,  8: append mode
 	}
@@ -486,7 +486,7 @@ function logn( str )
 
 function log( str )
 {
-	logn( str + "\n" );
+	logn( str + "\r\n" );
 }
 
 //log( "Working directory: " + g_sourceFolder );
@@ -502,8 +502,8 @@ function getLoc( withoutColumnInfo )
 function parseLog( str, withoutColumnInfo )
 {
 	var _msg;
-	_msg = "[" + scanning.file + ": " + getLoc(withoutColumnInfo) + "]\n";
-	_msg += str + "\n";
+	_msg = "[" + scanning.file + ": " + getLoc(withoutColumnInfo) + "]\r\n";
+	_msg += str + "\r\n";
 	logn( _msg );
 	return _msg;
 }
@@ -512,9 +512,9 @@ function popup( str, withoutColumnInfo, withoutScanningInfo )
 {
 	if( withoutScanningInfo == undefined || withoutScanningInfo == false ) {
 		var _msg = parseLog( str, withoutColumnInfo );
-		_msg += "--\n";
+		_msg += "--\r\n";
 	} else {
-		var _msg = str + "\n";
+		var _msg = str + "\r\n";
 	}
 	g_popupMsg += _msg;
 }
@@ -527,7 +527,7 @@ function saveJson( excelFile, jsonString )
 	if( !F.FolderExists( g_targetFolder ) ) {
 		F.CreateFolder( g_targetFolder );
 	}
-	
+
 	//http://msdn.microsoft.com/en-us/library/windows/desktop/ms677486(v=vs.85).aspx 
 	var A1 = WScript.CreateObject("ADODB.Stream");
 	A1.Charset = "utf-8"
@@ -826,7 +826,7 @@ function compileObjectArrayTable( sheet, row, keyIndex )
 			var obj = [];
 			var r = row;
 			var v;
-			while( (v=sheet[r][valCol]) != undefined && v != "") {
+			while( sheet[r] instanceof Array && (v=sheet[r][valCol] || "") != "") {
 				if( isArray ) {
 					subkey = subkey.substr( 0, subkey.length - 2 );
 					obj.push( readCSVLine( v ) );
@@ -881,7 +881,8 @@ function compileSheet( sheet, rootObject )
 			for( var col=1; col<line.length; col++ ) {
 				scanning.col = col;
 				var key = line[col];
-				if( key ) {
+				if( key.length > 0 ) {
+					parseLog( " Key: " + key + " at " + col );
 					keyIndex[ key ] = col;
 				}
 			}
@@ -926,7 +927,7 @@ function parseExcel( excelFile )
 	var sheetArray = [];
 	deleteTemp( tmpdir );
 	
-	log( "\nLoading: " + excelFile );
+	log( "\r\nLoading: " + excelFile );
 	
 	try {
 		for( var i = 1; i <= E.Worksheets.Count; i++ ) {
@@ -945,7 +946,7 @@ function parseExcel( excelFile )
 	deleteTemp( tmpdir );
 	log( "Closing: " + excelFile );
 	var rootObject = compileSheetArray( sheetArray );
-	return JSON.stringify( rootObject );
+	return JSON.stringify( rootObject ).split("\n").join("\r\n");
 }
 
 try {
@@ -967,7 +968,7 @@ try {
 		excels = getExcelFiles(g_sourceFolder);
 	}
 	if( excels.length == 0 ) {
-		W.Echo("There is no excel files in\n" + g_sourceFolder );
+		W.Echo("There is no excel files in\r\n" + g_sourceFolder );
 	}
 	
 	g_targetFolder = g_sourceFolder + g_targetFolder;
