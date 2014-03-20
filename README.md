@@ -186,6 +186,11 @@ array value. so, the result will be like this.
 }
 </pre>
 
+## Some technical marks ##
+
+### '!' prefixed sheet name ###
+
+You can insert '!' mark before a sheet name which is not considerred to be parsed. For e.g. '!Samples', '!Test' or '!Templates'.
 
 ## RUN Excel2Json.js ##
 
@@ -215,7 +220,4 @@ By running WSCRIPT.EXE Excel2Json.js file1.xlsx file2.xlsx product:
 	1. All the proceess is same with above.
 	2. But it does not search the directory for excel files.
 	3. And use the 'product' directory instead of 'output' for its result.
-	
-Excel-contents-format:
-
 	
