@@ -729,18 +729,14 @@ function compileSimpleTable( sheet, row, keyIndex )
 	}
 	
 	log( "Using key index: " + keyCol + " value index: " + valCol );
-	//try {
-		while( sheet[row] != undefined && sheet[row][keyCol] != undefined && sheet[row][keyCol] ) {
-			if( isArrayValue ) {
-				value[ sheet[row][keyCol] ] = readCSVLine( sheet[row][valCol] );
-			} else {
-				value[ sheet[row][keyCol] ] = getPrettyValue(sheet[row][valCol]);
-			}
-			row++;
+	while( sheet[row] != undefined && sheet[row][keyCol] != undefined && sheet[row][keyCol] ) {
+		if( isArrayValue ) {
+			value[ sheet[row][keyCol] ] = readCSVLine( sheet[row][valCol] );
+		} else {
+			value[ sheet[row][keyCol] ] = getPrettyValue(sheet[row][valCol]);
 		}
-	//} catch(e) {
-	//	popup(e);
-	//}
+		row++;
+	}
 	return value;
 }
 
@@ -755,26 +751,22 @@ function compileObjectObjectTable( sheet, row, keyIndex )
 		return null;
 	}
 	log( "Using key index: " + keyCol );
-	//try {
-		while( sheet[row] != undefined && sheet[row][keyCol] != undefined && sheet[row][keyCol] ) {
-			var obj = {};
-			
-			for( subkey in keyIndex ) {
-				if( subkey == "$key" ) continue;
-				var valCol = keyIndex[subkey];
-				if( subkey.endsWith( "[]" ) ) {
-					subkey = subkey.substr( 0, subkey.length - 2 );
-					obj[ subkey ] = readCSVLine( sheet[row][valCol] );
-				} else {
-					obj[ subkey ] = getPrettyValue( sheet[row][valCol] );
-				}
+	while( sheet[row] != undefined && sheet[row][keyCol] != undefined && sheet[row][keyCol] ) {
+		var obj = {};
+		
+		for( subkey in keyIndex ) {
+			if( subkey == "$key" ) continue;
+			var valCol = keyIndex[subkey];
+			if( subkey.endsWith( "[]" ) ) {
+				subkey = subkey.substr( 0, subkey.length - 2 );
+				obj[ subkey ] = readCSVLine( sheet[row][valCol] );
+			} else {
+				obj[ subkey ] = getPrettyValue( sheet[row][valCol] );
 			}
-			value[ sheet[row][keyCol] ] = obj;
-			row++;
 		}
-	//} catch(e) {
-	//	popup(e);
-	//}
+		value[ sheet[row][keyCol] ] = obj;
+		row++;
+	}
 	return value;
 }
 
@@ -782,34 +774,30 @@ function compileArrayObjectTable( sheet, row, keyIndex )
 {
 	var value = [];
 	log( "Parsing Array Object Table..." );
-	//try {
-		while( sheet[row] != undefined ) {
-			var obj = {};
-			var isSane = false;
-			for( subkey in keyIndex ) {
-				var valCol = keyIndex[subkey];
-				if( subkey.endsWith( "[]" ) ) {
-					subkey = subkey.substr( 0, subkey.length - 2 );
-					obj[ subkey ] = readCSVLine( sheet[row][valCol] );
-					if( obj[subkey].length > 0 ) {
-						isSane = true;
-					}
-				} else {
-					obj[ subkey ] = getPrettyValue(sheet[row][valCol]);
-					if( obj[subkey] ) {
-						isSane = true;
-					}
+	while( sheet[row] != undefined ) {
+		var obj = {};
+		var isSane = false;
+		for( subkey in keyIndex ) {
+			var valCol = keyIndex[subkey];
+			if( subkey.endsWith( "[]" ) ) {
+				subkey = subkey.substr( 0, subkey.length - 2 );
+				obj[ subkey ] = readCSVLine( sheet[row][valCol] );
+				if( obj[subkey].length > 0 ) {
+					isSane = true;
+				}
+			} else {
+				obj[ subkey ] = getPrettyValue(sheet[row][valCol]);
+				if( obj[subkey] ) {
+					isSane = true;
 				}
 			}
-			if( !isSane ) {
-				break;
-			}
-			value.push( obj );
-			row++;
 		}
-	//} catch(e) {
-	//	popup(e);
-	//}
+		if( !isSane ) {
+			break;
+		}
+		value.push( obj );
+		row++;
+	}
 	return value;
 }
 
@@ -817,30 +805,26 @@ function compileObjectArrayTable( sheet, row, keyIndex )
 {
 	var value = {};
 	log( "Parsing Object Array Table..." );
-	//try {
-		for( subkey in keyIndex ) {
-			var valCol = keyIndex[subkey];
-			var isArray = false;
-			if( subkey.endsWith( "[]" ) ) {
-				isArray = true;
-			}
-			var obj = [];
-			var r = row;
-			var v;
-			while( sheet[r] instanceof Array && (v=String(sheet[r][valCol])) != "") {
-				if( isArray ) {
-					subkey = subkey.substr( 0, subkey.length - 2 );
-					obj.push( readCSVLine( v ) );
-				} else {
-					obj.push( getPrettyValue(v) );
-				}
-				r++;
-			}
-			value[ subkey ] = obj;
+	for( subkey in keyIndex ) {
+		var valCol = keyIndex[subkey];
+		var isArray = false;
+		if( subkey.endsWith( "[]" ) ) {
+			isArray = true;
 		}
-	//} catch(e) {
-	//	popup(e);
-	//}
+		var obj = [];
+		var r = row;
+		var v;
+		while( sheet[r] instanceof Array && (v=String(sheet[r][valCol])) != "") {
+			if( isArray ) {
+				subkey = subkey.substr( 0, subkey.length - 2 );
+				obj.push( readCSVLine( v ) );
+			} else {
+				obj.push( getPrettyValue(v) );
+			}
+			r++;
+		}
+		value[ subkey ] = obj;
+	}
 	return value;
 }
 
