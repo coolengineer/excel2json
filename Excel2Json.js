@@ -733,7 +733,7 @@ function compileSimpleTable( sheet, row, keyIndex )
 			if( isArrayValue ) {
 				value[ sheet[row][keyCol] ] = readCSVLine( sheet[row][valCol] );
 			} else {
-				value[ sheet[row][keyCol] ] = sheet[row][valCol];
+				value[ sheet[row][keyCol] ] = getPrettyValue(sheet[row][valCol]);
 			}
 			row++;
 		}
@@ -765,7 +765,7 @@ function compileObjectObjectTable( sheet, row, keyIndex )
 					subkey = subkey.substr( 0, subkey.length - 2 );
 					obj[ subkey ] = readCSVLine( sheet[row][valCol] );
 				} else {
-					obj[ subkey ] = sheet[row][valCol];
+					obj[ subkey ] = getPrettyValue( sheet[row][valCol] );
 				}
 			}
 			value[ sheet[row][keyCol] ] = obj;
@@ -794,7 +794,7 @@ function compileArrayObjectTable( sheet, row, keyIndex )
 						isSane = true;
 					}
 				} else {
-					obj[ subkey ] = sheet[row][valCol];
+					obj[ subkey ] = getPrettyValue(sheet[row][valCol]);
 					if( obj[subkey] ) {
 						isSane = true;
 					}
@@ -826,12 +826,12 @@ function compileObjectArrayTable( sheet, row, keyIndex )
 			var obj = [];
 			var r = row;
 			var v;
-			while( sheet[r] instanceof Array && (v=sheet[r][valCol] || "") != "") {
+			while( sheet[r] instanceof Array && (v=String(sheet[r][valCol])) != "") {
 				if( isArray ) {
 					subkey = subkey.substr( 0, subkey.length - 2 );
 					obj.push( readCSVLine( v ) );
 				} else {
-					obj.push( v );
+					obj.push( getPrettyValue(v) );
 				}
 				r++;
 			}
