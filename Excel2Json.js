@@ -633,7 +633,8 @@ function saveAsCSV( sheet, tmpdir )
 function getPrettyValue( value )
 {
 	if( value == null ) return "";
-	if( value != "" && isFinite(value) ) return Number(value);
+	if( typeof(value) == "number" ) return value;
+	if( typeof(value) == "string" && isFinite(value) ) return Number(value);
 	return String(value);
 }
 
