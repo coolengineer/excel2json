@@ -200,6 +200,7 @@ you can easily run the script by double click!
 You may also make your own start script, like an 'excel2json.bat' with which you can run the script
 specifying excel files and output folder name as the arguments.
 
+	MKDIR output
 	WSCRIPT.EXE Excel2Json.js file1.xlsx file2.xlsx product
 
 # HOWTO-WORK #
@@ -208,6 +209,7 @@ Internally, CSV format is used to parse excel files.
 
 By clicking the script in explorer:
 
+	0. Make 'output' folder (mkdir output)
 	1. Run the script in a folder without any argument (by clicking)
 	2. The script searches the folder for all excel files with extension .xls, .xlsx.
 	3. All the sheets in the excel file are converted to CSV files.
