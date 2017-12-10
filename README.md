@@ -7,7 +7,7 @@ Excel2json is a converting script that supports to manage well structured excel 
 
 You can freely redistribute this product with A-CUP-OF-BEER License (See source code)
 
-#USAGE#
+# USAGE #
 
 ## ADD SOME HINTS TO YOUR EXCEL FILE FOR JSON ##
 
